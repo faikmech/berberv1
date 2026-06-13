@@ -678,17 +678,18 @@ body::before{
   .nav-links{display:none}
   .nav-cta{font-size:.6rem;padding:.45rem 1rem}
 
-  /* Hero — tam ekran video, scroll-clip efekti kapalı */
-  #heroScrollContainer{height:100vh}
-  #heroSticky{position:fixed;top:0;left:0;clip-path:none!important}
-  #heroFloat{position:fixed;height:100vh}
-  #heroFloatInner{padding:0 1.2rem}
-  .brand-name{font-size:9vw;letter-spacing:0;white-space:nowrap;max-width:100%}
-  .brand-tagline{font-size:.74rem;max-width:280px}
-  .btn-hero{padding:1rem 2.4rem;font-size:.66rem;letter-spacing:.22em}
+  /* Hero — normal akışta, sabit yükseklik, scroll ile geçilir (fixed yok) */
+  #heroScrollContainer{height:100vh;width:100%;overflow:hidden}
+  #heroSticky{position:absolute;top:0;left:0;width:100%;height:100%;clip-path:none!important}
+  #heroFloat{position:absolute;top:0;left:0;right:0;height:100%}
+  #heroFloatInner{position:absolute;top:0;height:100%;padding:0 1rem;width:100%;left:0}
+  .brand-name{letter-spacing:0;line-height:1;white-space:nowrap;display:inline-block}
+  .brand-tagline{font-size:.72rem;max-width:260px}
+  .btn-hero{padding:.9rem 2rem;font-size:.62rem;letter-spacing:.18em}
+  .brand-eyebrow{font-size:.5rem;letter-spacing:.28em}
 
-  /* Booking section — fixed hero altında akış başlangıcı */
-  #mainContent{margin-top:100vh}
+  /* Booking section */
+  #mainContent{margin-top:0}
   #booking{padding:2rem 1.2rem 3rem}
   .section-title{font-size:clamp(1.7rem,8vw,2.4rem)}
   .section-sub{font-size:.82rem;margin-bottom:2.2rem}
@@ -1034,6 +1035,24 @@ body::before{
 const revealObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealObs.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
 function scrollToBooking(){document.getElementById('booking').scrollIntoView({behavior:'smooth',block:'start'})}
+
+// ══ BARBER YAZISINI EKRANA SIĞDIR (otomatik ölçek) ══
+(function(){
+  const el=document.querySelector('.brand-name');
+  const wrap=document.getElementById('heroFloatInner');
+  function fitBrandName(){
+    if(window.innerWidth>640){ el.style.fontSize=''; return; }
+    el.style.fontSize='100px'; // referans boyut
+    const available=wrap.clientWidth - 32; // yan padding payı
+    const actual=el.scrollWidth;
+    const newSize=Math.floor(100*(available/actual));
+    el.style.fontSize=newSize+'px';
+  }
+  fitBrandName();
+  if(document.fonts) document.fonts.ready.then(fitBrandName);
+  window.addEventListener('resize',fitBrandName);
+  window.addEventListener('orientationchange',fitBrandName);
+})();
 
 // ══ MOBİL HAMBURGER MENÜ ══
 (function(){
